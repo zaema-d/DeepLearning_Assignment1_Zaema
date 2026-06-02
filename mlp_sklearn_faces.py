@@ -18,7 +18,7 @@ def extract_person_label(file_name):
     return int(file_name.split('.')[0].replace('subject', '')) - 1  # Subtract 1 to make labels start from 0
 
 # Load data and labels
-dataset_dir = 'C:/Users/zaema/Downloads/archive/'
+dataset_dir = os.path.join(os.path.dirname(__file__), 'data/')
 
 for file_name in os.listdir(dataset_dir):
     img = plt.imread(os.path.join(dataset_dir, file_name))
