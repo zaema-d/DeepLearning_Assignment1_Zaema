@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form with Camera Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .camera {
+            width: 100%;
+        }
+
+        .capturePhoto {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+    <h2>User Registration</h2>
+    <form action="/register" method="post" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+
+        <div class="camera-container" id="camera-container1">
+            <video class="camera" id="camera1" width="500" height="500"></video>
+            <button class="capturePhoto" id="capturePhoto1">Capture Photo 1</button>
+        </div>
+
+        <div class="camera-container" id="camera-container2">
+            <video class="camera" id="camera2" width="500" height="500"></video>
+            <button class="capturePhoto" id="capturePhoto2">Capture Photo 2</button>
+        </div>
+
+        <canvas id="canvas1" width="500" height="500" style="display:none;"></canvas>
+        <canvas id="canvas2" width="500" height="500" style="display:none;"></canvas>
+
+        <input type="hidden" id="photo1Data" name="photo1Data">
+        <input type="hidden" id="photo2Data" name="photo2Data">
+
+        <input type="submit" value="Register">
+    </form>
+
+    <script>
+        function setupCamera(videoElementId, canvasId, photoDataId, captureButtonId) {
+            const video = document.getElementById(videoElementId);
+            const canvas = document.getElementById(canvasId);
+            const photoData = document.getElementById(photoDataId);
+            const captureBtn = document.getElementById(captureButtonId);
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                    document.querySelector(`#${videoElementId}`).parentNode.style.display = 'block';
+                });
+
+            captureBtn.addEventListener('click', function() {
+                canvas.getContext('2d').drawImage(video, 0, 0, 500, 500);
+                photoData.value = canvas.toDataURL('image/png');
+                alert(`${captureButtonId} Captured!`);
+            });
+        }
+
+        setupCamera('camera1', 'canvas1', 'photo1Data', 'capturePhoto1');
+        setupCamera('camera2', 'canvas2', 'photo2Data', 'capturePhoto2');
+        
+        document.querySelector("form").addEventListener("submit", function(e) {
+            if (!document.getElementById("photo1Data").value || !document.getElementById("photo2Data").value) {
+                e.preventDefault(); // Prevent form submission
+                alert("Please capture both photos before submitting.");
+            }
+        });
+
+    </script>
+</body>
+</html>
